@@ -39,13 +39,55 @@ input {
     @apply py-1;
 }
 
+input:disabled {
+    @apply text-gray-500;
+    @apply select-none;
+}
+
+textarea {
+    @apply placeholder:text-gray-400;
+    @apply placeholder:font-medium;
+    @apply placeholder:italic;
+    @apply border-gray-400;
+    @apply rounded-lg;
+    @apply border;
+}
+
+textarea:active {
+    outline: none;
+    @apply border-blue-700;
+}
+
+textarea::after, textarea::before {
+    @apply border-solid;
+}
+
+dialog::backdrop {
+    filter: blur(4px);
+    background-color: rgba(100, 100, 100, 0.5);
+}
+
 .default-button {
     @apply border;
+    border-style: none;
     @apply font-medium;
     @apply text-gray-100;
     @apply rounded-md;
     @apply duration-75;
+    border-color: brown;
+    @apply disabled:bg-gray-500;
 }
+
+.default-button:disabled {
+    @apply bg-gray-500;
+    @apply text-gray-400;
+    user-select: none;
+    pointer-events: none;
+}
+.default-button::before, .default-button::after {
+    border-style: none;
+}
+
 
 .default-button-padding {
     @apply px-5;

@@ -21,7 +21,7 @@ session_start();
         $result = '<li><a class="default-link"> Файлы </a></li>';
         // admin
         if (isset($_SESSION['admin']) && $_SESSION['admin']) {
-          $result .= '<li><a class="default-link" href="moderation.php"> Модерация </a></li>';
+          $result .= '<li><a class="default-link" href="categories.php"> Модерация </a></li>';
         }
         // user
         if (isset($_SESSION['username'])) {
@@ -73,30 +73,56 @@ session_start();
           <p>Количество загрузок</p>
         </div>
         <div id="files-data">
-          <?php
-          require 'api/server.php';
-          $start = isset($_GET['start']) ? $_GET['start'] : 0;
-          $page = isset($_GET['page']) ? $_GET['page'] : 1;
-          $end = $start + $page * 15;
-          $sql = "select * from categories limit 0, 15";
-          $result = mysqli_query($connection, $sql);
-
+        <?php
+          require 'utils/server.php';
+          $elements_per_page = $_GET['elements'] ?? 5;
+          $page = isset($_GET['page']) && $_GET['page'] > 0 ? $_GET['page'] : 1;
+          $start = ($page -1) * $elements_per_page;
+          $end = $start + $page * $elements_per_page;
+          $sql = "select * from categories";
+          $sql_limit = " limit $start, $end";
+          $query_sql = '';
+          if (isset($_GET['name']) && $_GET['name'] != '') {
+            $query_sql = ' where ' . $query_sql;
+            $encoded = mysqli_real_escape_string($connection, $_GET['name']);
+            $query_sql .= "name like '$encoded%' ";
+          }
+          if (isset($_GET['column']) && $_GET['column'] != '0') {
+            $query_sql .= " order by ";
+            $query_sql .= $_GET['column'] == '1' ? 'links' : 'total_downloads';
+            
+            if (isset($_GET['order']) && $_GET['column'] != 0) {
+              $query_sql .= $_GET['order'] == '1' ? '' : ' desc';
+            }
+          }
+          echo $sql . $query_sql . $sql_limit;
+          $result = mysqli_query($connection, $sql . $query_sql . $sql_limit);
+          $query_sql = "";
           if ($result->num_rows > 0) {
-            echo 'works fine';
             while ($row = $result->fetch_assoc()) {
-              echo `
-                  <div class="files_element shadow-sm grid grid-cols-5 p-4 my-2">
-                  <h3>$row->name</h3>
-                  <p>$row->description</p>
-                  <p>category</p>
+              $id = $row["id"];
+              $name = $row['name'];
+              $description = $row['description'];
+              $links = $row['links'];
+              $total_downloads = $row['total_downloads'];
+              echo <<<END
+                  <div class='files_element shadow-sm grid grid-cols-5 p-4 my-2'>
+                  <h3>$name</h3>
                   <div>
-                    <p></p>
+                    <p>$description</p>
                   </div>
                   <div>
-                    <p>100</p>
+                    <p>$links</p>
+                  </div>
+                  <div>
+                    <p> $total_downloads </p>
+                  </div>
+                  <div class='flex gap-1'>
+                    <a class='default-button mb-2 red-button px-4 py-2 flex justify-center ' href="actions/deleteCategory.php?id=$id"> <ion-icon name='trash-outline' style='font-size: 22px'> </ion-icon> </a>
+                    <button class='default-button mb-2 blue-button px-4 py-2 flex justify-center' onclick="displayUpdateModel($id, '$name', '$description')" > <ion-icon name='create-outline' style='font-size: 22px'> </ion-icon> </button>
                   </div>
                 </div>
-                  `;
+              END;
             }
           } else {
             echo `$result->num_rows < 0`;

@@ -2,7 +2,7 @@
 <html lang="en">
 
 <?php
-    require_once "api/utils.php";
+    require_once "utils/utils.php";
     session_start();
     if (isset($_SESSION["username"])) {
         redirect("index.php", $url);
@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="dist/output.css" />
 </head>
 <?php
-require_once("api/server.php");
+require_once("utils/server.php");
 
 $fail = false;
 $fail_reason = "";
@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       // проверка пароля
       if (password_verify( $data['salt'] . $password, $data['password'])) {
         session_start();
+        $_SESSION['id'] = $data['id'];
         $_SESSION['username'] = $username;
         $_SESSION['email'] = $data['email'];
         $_SESSION['banned'] = $data['banned'];

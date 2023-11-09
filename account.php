@@ -1,7 +1,7 @@
 <html lang="ru">
 <?php
 session_start();
-require "api/utils.php";
+require "utils/utils.php";
 
 if (!isset($_GET['username'])) {
     redirect("index.php", $url);
@@ -10,7 +10,7 @@ if (!isset($_GET['username'])) {
 $is_visitor_admin = isset($_SESSION['admin']) && $_SESSION['admin'];
 $is_target_admin = isset($_GET['admin']);
 $table = $is_target_admin ? "admins" : "users";
-$params = "username, confirmed, banned";
+$params = "id, username, confirmed, banned";
 if ($is_visitor_admin) {
     $params .= ", email";
 }
@@ -19,7 +19,7 @@ if ($is_target_admin && $is_visitor_admin) {
 }
 $query = "SELECT $params from $table where username = ? ";
 
-require "api/server.php";
+require "utils/server.php";
 $result = $connection->execute_query($query, [$_GET['username']]);
 $error = false;
 $error_reason = "";
@@ -44,38 +44,39 @@ if ($result->num_rows > 0) {
 
 <body>
     <header>
-        <nav class="shadow-md flex justify-between p-8 mb-4">
-            <img src="" />
-            <ul class="flex space-x-4">
-                <?php
-                $result = '<li><a class="default-link"> Файлы </a></li>';
-                // admin
-                if (isset($_SESSION['admin']) && $_SESSION['admin']) {
-                    $result .= '<li><a class="default-link" href="moderation.php"> Модерация </a></li>';
-                }
-                // user
-                if (isset($_SESSION['username'])) {
-                    $result .= '<li><a class="default-link" href="account.php"> Личный кабинет </a></li>';
-                    echo '<li><a class="default-link" href="logout.php"> Выход </a> </li>';
-                } else {
-                    $result .= '<li><a href="./register.php" class="default-link"> Регистрация </a>  </li>';
-                    $result .= '<li><a href="./login.php" class="default-link"> Вход </a>  </li>';
-                }
-                echo "$result";
+    <nav class="shadow-md flex justify-between p-8 mb-4">
+      <img src="" />
+      <ul class="flex space-x-4">
+        <?php
+        $result = '<li><a class="default-link"> Файлы </a></li>';
+        // admin
+        if (isset($_SESSION['admin']) && $_SESSION['admin']) {
+          $result .= '<li><a class="default-link" href="moderation.php"> Модерация </a></li>';
+        }
+        // user
+        if (isset($_SESSION['username'])) {
+          $result .= '<li><a class="default-link" href="profile.php"> Личный кабинет </a></li>';
+          echo '<li><a class="default-link" href="logout.php"> Выход </a> </li>';
+        } else {
+          // this is never invoked
+          $result .= '<li><a href="./register.php" class="default-link"> Регистрация </a>  </li>';
+          $result .= '<li><a href="./login.php" class="default-link"> Вход </a>  </li>';
+        }
+        echo "$result";
 
-                ?>
-            </ul>
-            <p>
-                <?php
-                // this works fine 
-                if (isset($_SESSION['username'])) {
-                    echo $_SESSION['username'];
-                } else {
-                    echo 'Аноним';
-                }
-                ?>
-            </p>
-        </nav>
+        ?>
+      </ul>
+      <p>
+        <?php
+        // this works fine 
+        if (isset($_SESSION['username'])) {
+          echo $_SESSION['username'];
+        } else {
+          echo 'Аноним';
+        }
+        ?>
+      </p>
+    </nav>
     </header>
     <main>
         <?php
@@ -124,13 +125,16 @@ if ($result->num_rows > 0) {
                     <?php echo $data['confirmed'] ? 'Аккаунт подтвержден' : 'Аккаунт не подтвержден' ?>
                 </h4>
                 <?php
+                $action_ban = $is_target_admin ? "banAdmin.php" : "banUser.php";
+                $action_verify = $is_target_admin ? "verifyAdmin.php" : "verifyUser.php";
+                $id = $data['id'];
                 if (isset($_SESSION['admin']) && $_SESSION['admin']) {
-                    echo '<div class="flex mb-2">
-            <a class="default-button red-button px-4 py-2 flex items-center"> <ion-icon name="ban-outline"
-                class="text-2xl"> </ion-icon> </button>
-            <button class="default-button blue-button px-4 py-2 flex items-center"> <ion-icon name="checkmark-circle"
-                class="text-2xl"> </ion-icon> </button>
-          </div>';
+                    echo `<div class="flex mb-2">
+            <a class="default-button red-button px-4 py-2 flex items-center" href="actions/$action_ban?id=${id}"> <ion-icon name="ban-outline"
+                class="text-2xl"> </ion-icon> </a>
+            <a class="default-button blue-button px-4 py-2 flex items-center" href=actions/$action_verify?id=${id}> <ion-icon name="checkmark-circle"
+                class="text-2xl"> </ion-icon> </a>
+          </div>`;
                 } ?>
             </div>
         </div>
