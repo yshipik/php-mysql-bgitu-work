@@ -88,6 +88,15 @@ dialog::backdrop {
     border-style: none;
 }
 
+.display-error {
+    @apply border;
+    @apply border-red-600;
+    @apply bg-red-500;
+    @apply text-white;
+    display: flex;
+    justify-content: center;
+}
+
 
 .default-button-padding {
     @apply px-5;
