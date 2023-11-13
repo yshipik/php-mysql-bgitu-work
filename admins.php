@@ -20,16 +20,18 @@ if (!is_admin()) {
 
 
 <?php
-include("actions/banUser.php");
-include("actions/verifyUser.php");
-include("actions/unbanUser.php");
-
+include("actions/admins/banAdmin.php");
+include("actions/admins/verifyAdmin.php");
+include("actions/admins/unbanAdmin.php");
+include("actions/admins/createAdmin.php");
+include("actions/admins/editAdmin.php");
+include("actions/admins/deleteAdmins.php");
 ?>
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Пользователи</title>
+    <title>Администраторы</title>
     <script src="scripts/modalController.js" defer></script>
     <link rel="stylesheet" href="dist/output.css" />
 
@@ -102,11 +104,12 @@ include("actions/unbanUser.php");
             </div>
 
             <div class="files md:w-2/3 lg:w-1/2 mx-auto">
-                <div class="files_header shadow-sm grid grid-cols-5 p-4 my-2">
-                    <h3>Имя пользователя</h3>
+                <div class="files_header shadow-sm grid grid-cols-6 p-4 my-2">
+                    <h3>Никнейм</h3>
                     <p>Email </p>
                     <p>Забанен</p>
                     <p> Подтвержден </p>
+                    <p> Права </p>
                     <p> Действия </p>
                 </div>
                 <div id="categories-data" class="mb-4">
@@ -121,13 +124,13 @@ include("actions/unbanUser.php");
                     ?>
                     <?php
 
-                    $target_table = "users"; // change this on another page;
+                    $target_table = "admins"; // change this on another page;
                     require_once 'utils/server.php';
                     $elements_per_page = $_GET['elements'] ?? 2;
                     $page = isset($_GET['page']) && $_GET['page'] > 0 ? $_GET['page'] : 1;
                     $start = ($page - 1) * $elements_per_page;
                     $end = $start + $page * $elements_per_page;
-                    $sql = "select * from users";
+                    $sql = "select * from $target_table";
                     $sql_limit = " limit $start, $end";
                     $query_sql = '';
                     $where_trigger = false;
@@ -164,10 +167,15 @@ include("actions/unbanUser.php");
                             $confirmed = $row['confirmed'] == 1 ? 'Да' : 'Нет';
                             $banned = $row['banned'] == 1 ? 'Да' : 'Нет';
                             $is_banned = $row['banned'] == 1;
+                            // admins rights
+                            $block_admins = $row['block_admins'] == 1 ? 'Блокировка администраторов' : '';
+                            $block_users = $row['block_users'] == 1 ? 'Блокировка пользователей' : '';
+                            $edit_downloads = $row['edit_downloads'] == 1 ? 'Редактирование' : '';
+                            $delete_downloads = $row['delete_downloads'] == 1 ? 'Удаление' : '';
 
 
                             echo "
-                  <div class='files_element shadow-sm grid grid-cols-5 p-4 my-2'>
+                  <div class='files_element shadow-sm grid grid-cols-6 p-4 my-2'>
                   <h3>$username</h3>
                   <div>
                     <p>$email</p>
@@ -177,6 +185,21 @@ include("actions/unbanUser.php");
                   </div>
                   <div>
                     <p> $confirmed </p>
+                  </div>
+                  <div>
+                    <div>
+                        <p> $block_admins </p>
+                    </div>
+                    <div>
+                        <p> $block_users </p>
+                    </div>
+                    <div>
+                        <p> $edit_downloads </p>
+                    </div>
+
+                    <div>
+                        <p> $delete_downloads </p>
+                    </div>
                   </div>
                   <div class='flex gap-1'>";
 
@@ -234,7 +257,7 @@ include("actions/unbanUser.php");
                                 $name = $_GET['name'];
                                 echo "<input type='hidden' value='$name' name='name' /> ";
                             }
-                            $forward_state = $page <= $pages ? '': 'disabled';
+                            $forward_state = $page <= $pages ? '' : 'disabled';
                             $backward_state = $page <= 1 ? 'disabled' : '';
                             echo <<<END
                     <button type="submit" onclick='submitCatcher(-1)' $backward_state class="flex items-center default-button py-1 px-4 blue-button"> <ion-icon style="font-size: 22px" name="arrow-back-circle-outline"></ion-icon> </button>
@@ -253,11 +276,31 @@ include("actions/unbanUser.php");
                     <form class="flex flex-col gap-4" method="post">
                         <h4 class="block text-center"> Категория </h4>
                         <input type="hidden" name="action" value="create" required />
-                        <input type="text" placeholder="Название категории" name="name" class="py-4" required />
-                        <textarea rows="5" placeholder="Описание категории" name="description" required
-                            class="py-4"> </textarea>
+                        <input type="text" placeholder="Имя пользователя" name="username" class="py-4" required />
+                        <input type="email" placeholder="Email" name="email" class="py-4" required />
+                        <input type="password" placeholder="Пароль" name="password" class="py-4" required />
+                        <div class="flex gap-2">
+                            <p class="text-sm"> Право редактирования </p>
+                            <input type="checkbox" placeholder="Право редактирования" id="edit_downloads" name="edit_downloads" />
+
+                        </div>
+                        <div class="flex gap-2">
+                            <p class="text-sm"> Право удаления </p>
+                            <input type="checkbox" placeholder="Право удаления" id="delete_downloads" name="delete_downloads" />
+
+                        </div>
+                        <div class="flex gap-2">
+                            <p class="text-sm"> Право блокировки пользователей </p>
+                            <input type="checkbox" placeholder="Право блокировки пользователей" id="block_users" name="block_users" />
+
+                        </div>
+                        <div class="flex gap-2">
+                            <p class="text-sm"> Право блокировки администраторов </p>
+                            <input type="checkbox" placeholder="Право блокировки администраторов" id="block_admins" name="block_admins" />
+
+                        </div>
                         <button class="default-button green-button default-button-padding" type="submit"> Добавить
-                            категорию</button>
+                            администратора</button>
                     </form>
                 </dialog>
 

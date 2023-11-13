@@ -35,7 +35,7 @@ if (isset($_SESSION["username"])) {
         $result = "";
         if ($username == 'root') {
           $result = $connection->execute_query(
-            "INSERT INTO admins values (NULL, ?, ?, ?, ?, default, default, default, default, default, default)"
+            "INSERT INTO admins values (NULL, ?, ?, ?, ?, 1, default, 1, 1, 1, 1)"
             ,
             [$username, $email, $hash, $salt]
           );

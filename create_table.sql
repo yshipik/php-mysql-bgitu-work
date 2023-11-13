@@ -12,8 +12,8 @@ create table
 create table
     if not exists users (
         id int primary key AUTO_INCREMENT,
-        username varchar(256) not null,
-        email varchar(256) not null,
+        username varchar(256) not null unique,
+        email varchar(256) not null unique,
         password varchar(256) not null,
         salt varbinary(256) not null,
         confirmed boolean default 0,
@@ -39,8 +39,8 @@ create table
 create table
     if not exists admins (
         id int primary key AUTO_INCREMENT,
-        username varchar(256) not null,
-        email varchar(256) not null,
+        username varchar(256) not null unique,
+        email varchar(256) not null unique,
         password varchar(256) not null,
         salt varbinary(256) not null,
         confirmed boolean default 0,
