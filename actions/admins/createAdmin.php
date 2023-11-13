@@ -12,9 +12,14 @@ if (isset($_POST['action']) && $_POST['action'] == 'create' && isset($_POST['use
         $delete_downloads = isset($_POST['delete_downloads']) &&  $_POST['delete_downloads'] == "on" ? 1 : 0;
         $salt = random_bytes(10);
         $hash = password_hash($salt . $password, PASSWORD_DEFAULT);
+        try {
 
-        $sql = "INSERT INTO admins values (NULL, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?) ";
-        $connection->execute_query($sql, array($username, $email, $password, $salt, $edit_downloads, $delete_downloads, $block_users, $block_admins));
+            $sql = "INSERT INTO admins values (NULL, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?) ";
+            $connection->execute_query($sql, array($username, $email, $password, $salt, $edit_downloads, $delete_downloads, $block_users, $block_admins));
+
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
     } else {
         $error = "У вас недостаточно прав для проведения этой операции";
     }

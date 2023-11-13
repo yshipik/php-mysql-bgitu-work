@@ -230,8 +230,7 @@ include("actions/deleteCategory.php");
             <input type="text" placeholder="Название категории" id="edit_name" name="name" class="py-4" required />
             <textarea rows="5" placeholder="Описание категории" id="edit_description" name="description" required
               class="py-4"> </textarea>
-            <button class="default-button green-button default-button-padding" type="submit"> Добавить
-              категорию</button>
+            <button class="default-button green-button default-button-padding" type="submit"> Изменить</button>
           </form>
         </dialog>
 

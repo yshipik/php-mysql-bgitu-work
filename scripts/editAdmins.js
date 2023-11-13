@@ -1,25 +1,23 @@
 const adminUsernameItem = document.body.querySelector("#edit_name");
-const adminPasswordItem = document.body.querySelector("#edit_description");
-const adminEmailItem = document.body.querySelector("#edit_description");
-const adminEditRightItem = document.body.querySelector("");
-const adminDeleteRightItem = document.body.querySelector("");
-const adminBlockAdminRightItem = document.body.querySelector("");
-const adminBlockUsersRightItem = document.body.querySelector("");
-const adminIdItem = document.body.querySelector("");
-const admin = document.body.querySelector("#edit_id");
+const adminPasswordItem = document.body.querySelector("#edit_password");
+const adminEmailItem = document.body.querySelector("#edit_email");
+const adminEditRightItem = document.body.querySelector("#edit_downloads");
+const adminDeleteRightItem = document.body.querySelector("#delete_downloads");
+const adminBlockAdminRightItem = document.body.querySelector("#block_admins");
+const adminBlockUsersRightItem = document.body.querySelector("#block_users");
+const adminIdItem = document.body.querySelector("#edit_id");
 const editDialogId = document.body.querySelector("#edit");
 
-function displayUpdateModel(id, username, email, password, edit_right, delete_right, user_right, admin_right ) {
+function displayUpdateModel(id, username, email, edit_right, delete_right, user_right, admin_right ) {
   adminIdItem.value = id;
   adminUsernameItem.value = username;
-  adminPasswordItem.value = password;
   adminEmailItem.value = email;
-
-  adminEditRightItem.checked = edit_right == 1 ? "on": "off";
-  adminDeleteRightItem.checked = delete_right == 1 ? "on": "off";
-  adminBlockUsersRightItem.checked = user_right == 1 ? "on": "off";
-  adminBlockAdminRightItem.checked = admin_right == 1 ? "on": "off";
+  
   editDialogId.showModal();
+  adminEditRightItem.checked = edit_right == 1 ? 'checked': false;
+  adminDeleteRightItem.checked = delete_right == 1 ? 'checked': false;
+  adminBlockUsersRightItem.checked = user_right == 1 ? 'checked': false;
+  adminBlockAdminRightItem.checked = admin_right == 1 ? true: false;
 }
 
 const pageNumberElement = document.body.querySelector("#page_number");
