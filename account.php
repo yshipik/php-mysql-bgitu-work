@@ -3,10 +3,12 @@
 session_start();
 require "utils/utils.php";
 
-if (!isset($_GET['username'])) {
+if (!isset($_GET['id'])) {
     redirect("index.php", $url);
 }
 
+include "actions/banUser.php";
+include "actions/verifyUser.php";
 $is_visitor_admin = isset($_SESSION['admin']) && $_SESSION['admin'];
 $is_target_admin = isset($_GET['admin']);
 $table = $is_target_admin ? "admins" : "users";
@@ -15,12 +17,12 @@ if ($is_visitor_admin) {
     $params .= ", email";
 }
 if ($is_target_admin && $is_visitor_admin) {
-    $params = ", edit_downloads, delete_downloads, block_users, block_admins";
+    $params .= ", edit_downloads, delete_downloads, block_users, block_admins";
 }
-$query = "SELECT $params from $table where username = ? ";
+$query = "SELECT $params from $table where id = ? ";
 
 require "utils/server.php";
-$result = $connection->execute_query($query, [$_GET['username']]);
+$result = $connection->execute_query($query, [$_GET['id']]);
 $error = false;
 $error_reason = "";
 $data = null;
@@ -30,12 +32,13 @@ if ($result->num_rows > 0) {
     $error = true;
     $error_reason = "Пользователь не найден";
 }
+$is_banned = isset($data['banned']) && $data['banned'] == 1;
 ?>
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Файлы</title>
+    <title>Аккаунт</title>
     <script src="scripts/files_page.js" defer></script>
     <link rel="stylesheet" href="dist/output.css" />
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
@@ -44,39 +47,39 @@ if ($result->num_rows > 0) {
 
 <body>
     <header>
-    <nav class="shadow-md flex justify-between p-8 mb-4">
-      <img src="" />
-      <ul class="flex space-x-4">
-        <?php
-        $result = '<li><a class="default-link"> Файлы </a></li>';
-        // admin
-        if (isset($_SESSION['admin']) && $_SESSION['admin']) {
-          $result .= '<li><a class="default-link" href="moderation.php"> Модерация </a></li>';
-        }
-        // user
-        if (isset($_SESSION['username'])) {
-          $result .= '<li><a class="default-link" href="profile.php"> Личный кабинет </a></li>';
-          echo '<li><a class="default-link" href="logout.php"> Выход </a> </li>';
-        } else {
-          // this is never invoked
-          $result .= '<li><a href="./register.php" class="default-link"> Регистрация </a>  </li>';
-          $result .= '<li><a href="./login.php" class="default-link"> Вход </a>  </li>';
-        }
-        echo "$result";
+        <nav class="shadow-md flex justify-between p-8 mb-4">
+            <img src="" />
+            <ul class="flex space-x-4">
+                <?php
+                $result = '<li><a class="default-link"> Файлы </a></li>';
+                // admin
+                if (isset($_SESSION['admin']) && $_SESSION['admin']) {
+                    $result .= '<li><a class="default-link" href="moderation.php"> Модерация </a></li>';
+                }
+                // user
+                if (isset($_SESSION['username'])) {
+                    $result .= '<li><a class="default-link" href="profile.php"> Личный кабинет </a></li>';
+                    echo '<li><a class="default-link" href="logout.php"> Выход </a> </li>';
+                } else {
+                    // this is never invoked
+                    $result .= '<li><a href="./register.php" class="default-link"> Регистрация </a>  </li>';
+                    $result .= '<li><a href="./login.php" class="default-link"> Вход </a>  </li>';
+                }
+                echo "$result";
 
-        ?>
-      </ul>
-      <p>
-        <?php
-        // this works fine 
-        if (isset($_SESSION['username'])) {
-          echo $_SESSION['username'];
-        } else {
-          echo 'Аноним';
-        }
-        ?>
-      </p>
-    </nav>
+                ?>
+            </ul>
+            <p>
+                <?php
+                // this works fine 
+                if (isset($_SESSION['username'])) {
+                    echo $_SESSION['username'];
+                } else {
+                    echo 'Аноним';
+                }
+                ?>
+            </p>
+        </nav>
     </header>
     <main>
         <?php
@@ -107,17 +110,17 @@ if ($result->num_rows > 0) {
 
                 <h4 class="text-md">
                     <?php if (isset($data['edit_downloads'])) {
-                        echo '<h4 class="text-md"> Редактирование файлов: ' . $data['edit_downloads'] ? "разрешен" : "запрещен" . "</h4>";
+                        echo '<h4 class="text-md"> Редактирование файлов: ' . ($data['edit_downloads'] ? "разрешено" : "запрещено") . "</h4>";
                     } ?>
                 </h4>
                 <h4 class="text-md">
                     <?php if (isset($data['delete_downloads'])) {
-                        echo '<h4 class="text-md"> Email: ' . $data['delete_downloads'] ? "разрешен" : "запрещен" . "</h4>";
+                        echo '<h4 class="text-md"> Удаление файлов: ' . ($data['delete_downloads'] ? "разрешено" : "запрещено") . "</h4>";
                     } ?>
                 </h4>
                 <h4 class="text-md">
                     <?php if (isset($data['block_users'])) {
-                        echo '<h4 class="text-md"> Бан пользователей: ' . $data['block_users'] ? "разрешен" : "запрещен" . "</h4>";
+                        echo "<h4 class='text-md'> Бан пользователей: " . ($data['block_users'] ? "разрешено" : "запрещено") . "</h4>";
                     } ?>
                 </h4>
 
@@ -125,17 +128,43 @@ if ($result->num_rows > 0) {
                     <?php echo $data['confirmed'] ? 'Аккаунт подтвержден' : 'Аккаунт не подтвержден' ?>
                 </h4>
                 <?php
-                $action_ban = $is_target_admin ? "banAdmin.php" : "banUser.php";
-                $action_verify = $is_target_admin ? "verifyAdmin.php" : "verifyUser.php";
-                $id = $data['id'];
-                if (isset($_SESSION['admin']) && $_SESSION['admin']) {
-                    echo `<div class="flex mb-2">
-            <a class="default-button red-button px-4 py-2 flex items-center" href="actions/$action_ban?id=${id}"> <ion-icon name="ban-outline"
-                class="text-2xl"> </ion-icon> </a>
-            <a class="default-button blue-button px-4 py-2 flex items-center" href=actions/$action_verify?id=${id}> <ion-icon name="checkmark-circle"
-                class="text-2xl"> </ion-icon> </a>
-          </div>`;
-                } ?>
+                echo "<div class='flex gap-1'>";
+                if (is_logged_in()) {
+                    
+                    if (!$is_banned) {
+                        $id = $data['id'];
+    
+                        echo <<<END
+                            <form method='post'>
+                            <input type='hidden' value="ban" name="action" />
+                            <input type="hidden" value="$id" name="id" />
+                            <button class='default-button mb-2 red-button px-4 py-2 flex justify-center ' type="submit"> <ion-icon name='lock-closed-outline' style='font-size: 22px'> </ion-icon> </button>
+                            </form>
+                        END;
+                    } else {
+                        echo <<<END
+                            <form method='post'>
+                            <input type='hidden' value="unban" name="action" />
+                            <input type="hidden" value="$id" name="id" />
+                            <button class='default-button mb-2 green-button px-4 py-2 flex justify-center ' type="submit"> <ion-icon name='lock-open-outline' style='font-size: 22px'> </ion-icon> </button>
+                            </form>
+                        END;
+                    }
+                    if (!$is_banned) {
+    
+                        echo <<<END
+                            <form method='post'>
+                                <input type="hidden" value="verify" name="action" />
+                                <input type="hidden" value="$id" name="id" />
+                                <button class='default-button mb-2 blue-button px-4 py-2 flex justify-center ' type="submit"> <ion-icon name='checkmark-circle-outline' style='font-size: 22px'> </ion-icon> </button>
+                            </form>
+                            END;
+                    }
+                }
+
+                echo "</div></div>";
+
+                ?>
             </div>
         </div>
     </main>

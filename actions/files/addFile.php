@@ -7,9 +7,12 @@ if (is_logged_in() && isset($_POST['action']) && $_POST['action'] == 'create' &&
         $user_id = $_SESSION['id'];
         $sql = "insert into files values (NULL, ?, ?, ?, default, default, now(), default, ?, ?) ";
         try {
-            $result = $connection->execute_query($sql, [$name, $description, $category_id, $link, $user_id]);
+            echo $user_id;
+            $result = $connection->execute_query($sql, array($name, $description, $category_id, $link, $user_id));
+            $sucess = "Файл успешно добавлен";
         } catch (Throwable $th) {
             if (str_contains(mysqli_error($connection), "Duplicate")) {
+                echo "bag";
                 $error = "Такой файл уже существует";
             }
         }

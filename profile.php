@@ -2,10 +2,8 @@
 <html lang="en">
 <?php
 session_start();
-require("api/utils.php");
-if (!isset($_SESSION['username'])) {
-  redirect("index.php", $url);
-}
+require_once("utils/utils.php");
+
 ?>
 
 <head>
@@ -75,15 +73,7 @@ if (!isset($_SESSION['username'])) {
         <h4 class="mb-2">
           <?php echo $_SESSION['confirmed'] ? 'Аккаунт подтвержден' : 'Аккаунт не подтвержден' ?>
         </h4>
-        <?php
-        if (isset($_SESSION['admin']) && $_SESSION['admin']) {
-          echo '<div class="flex mb-2">
-            <a class="default-button red-button px-4 py-2 flex items-center"> <ion-icon name="ban-outline"
-                class="text-2xl"> </ion-icon> </button>
-            <button class="default-button blue-button px-4 py-2 flex items-center"> <ion-icon name="checkmark-circle"
-                class="text-2xl"> </ion-icon> </button>
-          </div>';
-        } ?>
+        
         <button class="default-button red-button px-4 py-2 items-center flex" style="font-size: 14px"> <ion-icon
             name="trash-bin" style="font-size: 20px;"> </ion-icon> Удалить аккаунт </button>
       </div>

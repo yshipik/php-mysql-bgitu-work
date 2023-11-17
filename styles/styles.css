@@ -26,6 +26,7 @@ p {
 
 }
 
+
 input {
     @apply border;
     @apply text-sm;
@@ -51,6 +52,10 @@ textarea {
     @apply border-gray-400;
     @apply rounded-lg;
     @apply border;
+}
+
+textarea::placeholder {
+    color: gray !important;
 }
 
 textarea:active {
@@ -97,6 +102,15 @@ dialog::backdrop {
     justify-content: center;
 }
 
+.display-success {
+    @apply border;
+    @apply border-green-600;
+    @apply bg-green-500;
+    @apply text-white;
+    display: flex;
+    justify-content: center;
+}
+
 
 .default-button-padding {
     @apply px-5;
@@ -127,6 +141,11 @@ dialog::backdrop {
 
 .red-button:active {
     @apply bg-red-900;
+}
+
+.link-decorated {
+    text-decoration: dashed;
+    text-decoration-color: rgb(87, 188, 246);
 }
 
 .green-button {

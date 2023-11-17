@@ -92,10 +92,12 @@ include("actions/unbanUser.php");
                         <option value="1">Подтвержден</option>
                         <option value="0">Не подтвержден</option>
                     </select>
-                    <button type="resest" class="default-button blue-button px-6 flex items-center"> <ion-icon
-                            name="refresh-outline" style="font-size: 22px"> </ion-icon> </button>
-                    <button type="submit" class="default-button blue-button px-6 flex items-center"> <ion-icon
-                            name="search-outline" style="font-size: 22px"> </ion-icon> </button>
+                    <button type="resest" class="default-button blue-button px-6 flex items-center">
+                        <ion-icon name="refresh-outline" style="font-size: 22px"> </ion-icon>
+                    </button>
+                    <button type="submit" class="default-button blue-button px-6 flex items-center">
+                        <ion-icon name="search-outline" style="font-size: 22px"> </ion-icon>
+                    </button>
 
 
                 </form>

@@ -33,7 +33,7 @@ include("actions/deleteCategory.php");
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Файлы</title>
+  <title>Категории</title>
   <script src="scripts/modalController.js" defer></script>
   <link rel="stylesheet" href="dist/output.css" />
 
@@ -95,9 +95,10 @@ include("actions/deleteCategory.php");
             <option value="1">По возрастанию</option>
             <option value="0">По убыванию</option>
           </select>
+          <button type="resest" class="default-button blue-button px-6 flex items-center"> <ion-icon
+              name="refresh-outline" style="font-size: 22px"> </ion-icon> </button>
           <button type="submit" class="default-button blue-button px-6 flex items-center"> <ion-icon
               name="search-outline" style="font-size: 22px"> </ion-icon> </button>
-
 
         </form>
       </div>

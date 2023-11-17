@@ -7,6 +7,10 @@ function redirect($target, $url)
     exit();
 }
 
+function absolute_redirect($target) {
+    header("Location: " . $target);
+}
+
 function is_logged_in()
 {
     if (isset($_SESSION["id"])) {
@@ -23,6 +27,28 @@ function not_banned()
     } else {
         return false;
     }
+}
+
+function is_set_get_parameter($name) {
+    if (isset($_GET[$name]) && $_GET[$name] != '') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function is_action($action_name) {
+    if(isset($_POST['action']) && $_POST['action'] == $action_name) {
+        return true;
+    }
+    return false;
+}
+
+function is_post($parameter) {
+    if(isset($_POST[$parameter]) && $_POST[$parameter] != '') {
+        return true;
+    }
+    return false;
 }
 
 function is_admin()
