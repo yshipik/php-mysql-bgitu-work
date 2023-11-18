@@ -42,41 +42,9 @@ include("actions/admins/deleteAdmins.php");
 </head>
 
 <body>
-    <header>
-        <nav class="shadow-md flex justify-between p-8 mb-4">
-            <img src="" />
-            <ul class="flex space-x-4">
-                <?php
-                $result = '<li><a class="default-link"> Файлы </a></li>';
-                // admin
-                if (isset($_SESSION['admin']) && $_SESSION['admin']) {
-                    $result .= '<li><a class="default-link" href="categories.php"> Категории </a></li>';
-                    $result .= '<li><a class="default-link" href="users.php"> Пользователи </a></li>';
-                    $result .= '<li><a class="default-link" href="complaints.php"> Жалобы </a></li>';
-                }
-                // user
-                if (isset($_SESSION['username'])) {
-                    $result .= '<li><a class="default-link" href="profile.php"> Личный кабинет </a></li>';
-                    $result .= '<li><a class="default-link" href="logout.php"> Выход </a> </li>';
-                } else {
-                    $result .= '<li><a href="./register.php" class="default-link"> Регистрация </a>  </li>';
-                    $result .= '<li><a href="./login.php" class="default-link"> Вход </a>  </li>';
-                }
-                echo "$result";
-
-                ?>
-            </ul>
-            <p>
-                <?php
-                if (isset($_SESSION['username'])) {
-                    echo $_SESSION['username'];
-                } else {
-                    echo 'Аноним';
-                }
-                ?>
-            </p>
-        </nav>
-    </header>
+    <?php
+    include("components/navbar.php");
+    ?>
     <main>
         <div>
             <div class="space-x-8 md:w-2/3 lg:w-1/2 mx-auto mb-6">
@@ -180,7 +148,7 @@ include("actions/admins/deleteAdmins.php");
 
                             echo "
                   <div class='files_element shadow-sm grid grid-cols-6 p-4 my-2'>
-                  <h3>$username</h3>
+                  <a class='default-link' href='accountAdmin.php?id=$id' >$username</a>
                   <div>
                     <p>$email</p>
                   </div>
@@ -219,7 +187,7 @@ include("actions/admins/deleteAdmins.php");
                             } else {
                                 echo <<<END
                                 <form method='post'>
-                                <inpfut type='hidden' value="unban" name="action" />
+                                <input type='hidden' value="unban" name="action" />
                                 <input type="hidden" value="$id" name="id" />
                                 <button class='default-button mb-2 green-button px-4 py-2 flex justify-center ' type="submit"> <ion-icon name='lock-open-outline' style='font-size: 22px'> </ion-icon> </button>
                                 </form>
@@ -241,7 +209,10 @@ include("actions/admins/deleteAdmins.php");
                               <input type="hidden" value="$id" name="id" />
                               <button class='default-button mb-2 red-button px-4 py-2 flex justify-center ' type="submit"> <ion-icon name='trash-outline' style='font-size: 22px'> </ion-icon> </button>
                               </form>
+                              <div>
+
                               <button class='default-button mb-2 blue-button px-4 py-2 flex justify-center' onclick="displayUpdateModel($id, '$username', '$email', $is_edit_downloads, $is_delete_downloads, $is_block_users, $is_block_admins)" > <ion-icon name='create-outline' style='font-size: 22px'> </ion-icon> </button>
+                              </div>
                             END;
                             echo "</div></div>";
                         }
@@ -292,26 +263,22 @@ include("actions/admins/deleteAdmins.php");
                         <input type="password" placeholder="Пароль" name="password" class="py-4" required />
                         <div class="flex gap-2">
                             <p class="text-sm"> Право редактирования </p>
-                            <input type="checkbox" placeholder="Право редактирования"
-                                name="edit_downloads" />
+                            <input type="checkbox" placeholder="Право редактирования" name="edit_downloads" />
 
                         </div>
                         <div class="flex gap-2">
                             <p class="text-sm"> Право удаления </p>
-                            <input type="checkbox" placeholder="Право удаления"
-                                name="delete_downloads" />
+                            <input type="checkbox" placeholder="Право удаления" name="delete_downloads" />
 
                         </div>
                         <div class="flex gap-2">
                             <p class="text-sm"> Право блокировки пользователей </p>
-                            <input type="checkbox" placeholder="Право блокировки пользователей"
-                                name="block_users" />
+                            <input type="checkbox" placeholder="Право блокировки пользователей" name="block_users" />
 
                         </div>
                         <div class="flex gap-2">
                             <p class="text-sm"> Право блокировки администраторов </p>
-                            <input type="checkbox" placeholder="Право блокировки администраторов"
-                                name="block_admins" />
+                            <input type="checkbox" placeholder="Право блокировки администраторов" name="block_admins" />
 
                         </div>
                         <button class="default-button green-button default-button-padding" type="submit"> Добавить
@@ -324,12 +291,11 @@ include("actions/admins/deleteAdmins.php");
                         <h4 class="block text-center"> Администратор </h4>
                         <input type="hidden" id="edit_id" name="id" required />
                         <input type="hidden" name="action" value="edit" required />
-                        
+
                         <input type="text" id="edit_name" placeholder="Имя пользователя" name="username" class="py-4"
                             required />
                         <input type="email" id="edit_email" placeholder="Email" name="email" class="py-4" required />
-                        <input type="password" id="edit_password" placeholder="Пароль" name="password" class="py-4"
-                         />
+                        <input type="password" id="edit_password" placeholder="Пароль" name="password" class="py-4" />
                         <div class="flex gap-2">
                             <p class="text-sm"> Право редактирования </p>
                             <input type="checkbox" placeholder="Право редактирования" id="edit_downloads"
@@ -354,7 +320,8 @@ include("actions/admins/deleteAdmins.php");
                                 name="block_admins" />
 
                         </div>
-                        <button class="default-button green-button default-button-padding" type="submit"> Обновить данные </button>
+                        <button class="default-button green-button default-button-padding" type="submit"> Обновить
+                            данные </button>
                     </form>
                 </dialog>
 

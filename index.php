@@ -35,41 +35,9 @@ include("actions/files/editFile.php");
 </head>
 
 <body>
-  <header>
-    <nav class="shadow-md flex justify-between p-8 mb-4">
-      <img src="" />
-      <ul class="flex space-x-4">
-        <?php
-        $result = '<li><a class="default-link"> Файлы </a></li>';
-        // admin
-        if (isset($_SESSION['admin']) && $_SESSION['admin']) {
-          $result .= '<li><a class="default-link" href="categories.php"> Категории </a></li>';
-          $result .= '<li><a class="default-link" href="users.php"> Пользователи </a></li>';
-          $result .= '<li><a class="default-link" href="complaints.php"> Жалобы </a></li>';
-        }
-        // user
-        if (isset($_SESSION['username'])) {
-          $result .= '<li><a class="default-link" href="profile.php"> Личный кабинет </a></li>';
-          $result .= '<li><a class="default-link" href="logout.php"> Выход </a> </li>';
-        } else {
-          $result .= '<li><a href="./register.php" class="default-link"> Регистрация </a>  </li>';
-          $result .= '<li><a href="./login.php" class="default-link"> Вход </a>  </li>';
-        }
-        echo "$result";
-
-        ?>
-      </ul>
-      <p>
-        <?php
-        if (isset($_SESSION['username'])) {
-          echo $_SESSION['username'];
-        } else {
-          echo 'Аноним';
-        }
-        ?>
-      </p>
-    </nav>
-  </header>
+  <?php
+  include("components/navbar.php");
+  ?>
   <main>
     <div>
       <div class="space-x-8 md:w-2/3 lg:w-1/2 mx-auto mb-6">

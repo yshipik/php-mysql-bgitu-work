@@ -35,41 +35,9 @@ include("actions/complaints/takeComplaint.php");
 </head>
 
 <body>
-    <header>
-        <nav class="shadow-md flex justify-between p-8 mb-4">
-            <img src="" />
-            <ul class="flex space-x-4">
-                <?php
-                $result = '<li><a class="default-link"> Файлы </a></li>';
-                // admin
-                if (isset($_SESSION['admin']) && $_SESSION['admin']) {
-                    $result .= '<li><a class="default-link" href="categories.php"> Категории </a></li>';
-                    $result .= '<li><a class="default-link" href="users.php"> Пользователи </a></li>';
-                    $result .= '<li><a class="default-link" href="complaints.php"> Жалобы </a></li>';
-                }
-                // user
-                if (isset($_SESSION['username'])) {
-                    $result .= '<li><a class="default-link" href="profile.php"> Личный кабинет </a></li>';
-                    $result .= '<li><a class="default-link" href="logout.php"> Выход </a> </li>';
-                } else {
-                    $result .= '<li><a href="./register.php" class="default-link"> Регистрация </a>  </li>';
-                    $result .= '<li><a href="./login.php" class="default-link"> Вход </a>  </li>';
-                }
-                echo "$result";
-
-                ?>
-            </ul>
-            <p>
-                <?php
-                if (isset($_SESSION['username'])) {
-                    echo $_SESSION['username'];
-                } else {
-                    echo 'Аноним';
-                }
-                ?>
-            </p>
-        </nav>
-    </header>
+    <?php
+    include("components/navbar.php");
+    ?>
     <main>
         <div>
             <div class="space-x-8 md:w-2/3 lg:w-1/2 mx-auto mb-6">
@@ -104,8 +72,8 @@ include("actions/complaints/takeComplaint.php");
                     } ?>
 
                     <?php
-                        if (isset($error)) {
-                            echo "
+                    if (isset($error)) {
+                        echo "
                                 <div class='display-error px-2 py-6'>
                                 <p> $error  </p>
                                 </div>
@@ -138,16 +106,16 @@ include("actions/complaints/takeComplaint.php");
 
                     if (is_set_get_parameter('borrowed')) {
                         $borrowed_status = 0;
-                        if($_GET['borrowed'] == 0) {
+                        if ($_GET['borrowed'] == 0) {
                             $borrowed_status = "в обработке";
-                        } else if($_GET['borrowed'] == 1) {
+                        } else if ($_GET['borrowed'] == 1) {
                             $borrowed_status = 'проверяется';
                         } else if ($_GET['borrowed'] == 2) {
                             $borrowed_status = "отклонено";
                         } else {
                             $borrowed_status = "принято";
                         }
-                        if(is_set_get_parameter("header") ) {
+                        if (is_set_get_parameter("header")) {
                             $query_sql .= " and ";
                         }
                         $query_sql .= " state = '$borrowed_status'";

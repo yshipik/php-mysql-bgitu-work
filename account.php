@@ -46,41 +46,9 @@ $is_banned = isset($data['banned']) && $data['banned'] == 1;
 </head>
 
 <body>
-    <header>
-        <nav class="shadow-md flex justify-between p-8 mb-4">
-            <img src="" />
-            <ul class="flex space-x-4">
-                <?php
-                $result = '<li><a class="default-link"> Файлы </a></li>';
-                // admin
-                if (isset($_SESSION['admin']) && $_SESSION['admin']) {
-                    $result .= '<li><a class="default-link" href="moderation.php"> Модерация </a></li>';
-                }
-                // user
-                if (isset($_SESSION['username'])) {
-                    $result .= '<li><a class="default-link" href="profile.php"> Личный кабинет </a></li>';
-                    echo '<li><a class="default-link" href="logout.php"> Выход </a> </li>';
-                } else {
-                    // this is never invoked
-                    $result .= '<li><a href="./register.php" class="default-link"> Регистрация </a>  </li>';
-                    $result .= '<li><a href="./login.php" class="default-link"> Вход </a>  </li>';
-                }
-                echo "$result";
-
-                ?>
-            </ul>
-            <p>
-                <?php
-                // this works fine 
-                if (isset($_SESSION['username'])) {
-                    echo $_SESSION['username'];
-                } else {
-                    echo 'Аноним';
-                }
-                ?>
-            </p>
-        </nav>
-    </header>
+    <?php
+    include("components/navbar.php");
+    ?>
     <main>
         <?php
         if ($error) {
@@ -129,11 +97,11 @@ $is_banned = isset($data['banned']) && $data['banned'] == 1;
                 </h4>
                 <?php
                 echo "<div class='flex gap-1'>";
-                if (is_logged_in()) {
-                    
+                if (is_logged_in() && $is_target_admin) {
+
                     if (!$is_banned) {
                         $id = $data['id'];
-    
+
                         echo <<<END
                             <form method='post'>
                             <input type='hidden' value="ban" name="action" />
@@ -151,7 +119,7 @@ $is_banned = isset($data['banned']) && $data['banned'] == 1;
                         END;
                     }
                     if (!$is_banned) {
-    
+
                         echo <<<END
                             <form method='post'>
                                 <input type="hidden" value="verify" name="action" />

@@ -29,6 +29,14 @@ function not_banned()
     }
 }
 
+function is_verified() {
+    if(isset($_SESSION['confirmed'])) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function is_set_get_parameter($name) {
     if (isset($_GET[$name]) && $_GET[$name] != '') {
         return true;
