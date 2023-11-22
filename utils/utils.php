@@ -22,7 +22,7 @@ function is_logged_in()
 
 function not_banned()
 {
-    if (!$_SESSION['banned']) {
+    if (isset($_SESSION['banned']) && $_SESSION['banned']) {
         return true;
     } else {
         return false;
@@ -30,7 +30,7 @@ function not_banned()
 }
 
 function is_verified() {
-    if(isset($_SESSION['confirmed'])) {
+    if(isset($_SESSION['confirmed']) && $_SESSION['confirmed']) {
         return true;
     } else {
         return false;

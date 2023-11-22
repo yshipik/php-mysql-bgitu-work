@@ -1,7 +1,7 @@
 <?php
 if (is_logged_in() && isset($_POST['action']) && $_POST['action'] == 'create' && isset($_POST['name']) && isset($_POST['description']) && isset($_POST['category_id']) && isset($_POST['link'])) {
         
-        if(!not_banned() && ! is_verified() ) {
+        if(!not_banned() && is_verified() ) {
             $name = $_POST['name'];
             $category_id = $_POST['category_id'];
             $description = $_POST['description'];

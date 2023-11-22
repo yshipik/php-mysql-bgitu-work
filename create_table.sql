@@ -62,3 +62,58 @@ create table
         constraint `files_file_foreign_key` foreign key (file_id) references files (id) on delete cascade on update restrict,
         constraint `files_admins_foreign_key` foreign key (admin_id) references admins (id) on delete cascade on update restrict
     );
+
+create view if not exists file_view as (select files.id as id, category_id, files.name as filename, link, files.description as description , rating, date, categories.links, downloads, users.id as author_id, users.username as author_name, categories.name as category_name from files inner join categories on files.category_id = categories.id inner join users on files.user_id = users.id);
+
+DROP TRIGGER IF EXISTS after_insert_files;
+
+-- Change the delimiter to handle semicolons within the trigger
+DELIMITER //
+
+-- Create the trigger
+CREATE TRIGGER after_insert_files
+AFTER INSERT
+ON files FOR EACH ROW
+
+BEGIN
+    DECLARE category_links INT;
+
+    -- Get the current value of links in the corresponding category
+    SELECT links INTO category_links
+    FROM categories
+    WHERE id = NEW.category_id;
+
+    -- Update the links value in the categories table
+    UPDATE categories
+    SET links = category_links + 1
+    WHERE id = NEW.category_id;
+END //
+
+-- Reset the delimiter to the default
+DELIMITER ;
+
+-- Change the delimiter to handle semicolons within the trigger
+DELIMITER //
+
+DROP TRIGGER IF EXISTS before_delete_files;
+-- Create the trigger
+CREATE TRIGGER before_delete_files
+BEFORE DELETE
+ON files FOR EACH ROW
+
+BEGIN
+    DECLARE category_links INT;
+
+    -- Get the current value of links in the corresponding category
+    SELECT links INTO category_links
+    FROM categories
+    WHERE id = NEW.category_id;
+
+    -- Update the links value in the categories table
+    UPDATE categories
+    SET links = category_links - 1
+    WHERE id = NEW.category_id;
+END //
+
+-- Reset the delimiter to the default
+DELIMITER ;
