@@ -97,16 +97,15 @@ include("actions/files/editFile.php");
           ?>
           <?php
           require_once 'utils/server.php';
-          $elements_per_page = $_GET['elements'] ?? 3;
+          $elements_per_page = $_GET['elements'] ?? 2;
           $page = isset($_GET['page']) && $_GET['page'] > 0 ? $_GET['page'] : 1;
           $start = ($page - 1) * $elements_per_page;
-          $end = $start + $page * $elements_per_page;
           $sql = "select files.id as id, category_id, files.name as filename, link, files.description as description , rating, date, links, downloads, users.id as author_id, users.username as author_name, categories.name as category_name from files";
           $join_sql = " inner join categories on files.category_id = categories.id inner join users on files.user_id = users.id";
-          $sql_limit = " limit $start, $end";
+          $sql_limit = " limit $start, $elements_per_page";
           $query_sql = '';
 
-          if (is_set_get_parameter('filename') || is_set_get_parameter('column') || is_set_get_parameter('category_id')) {
+          if (is_set_get_parameter('filename') || is_set_get_parameter('category_id')) {
             $query_sql = ' where';
           }
           if (is_set_get_parameter('filename')) {
@@ -120,14 +119,13 @@ include("actions/files/editFile.php");
           }
           if (is_set_get_parameter('column')) {
             $column = htmlentities(trim($_GET['column']));
-            $query_sql = " order by $column ";
+            $query_sql .= " order by $column ";
             if (is_set_get_parameter("order")) {
-              if ($order == 1) {
+              if ($_GET['order'] == 0) {
                 $query_sql .= " desc ";
               }
             }
           }
-
           $result = mysqli_query($connection, $sql . $join_sql . $query_sql . $sql_limit);
           $query_sql = "";
           if ($result->num_rows > 0) {
@@ -142,11 +140,12 @@ include("actions/files/editFile.php");
               $category_name = $row['category_name'];
               $rating = $row['rating'] ?? 0;
               $date = $row['date'];
+              $short_desc = substr($description, 0, 40);
               echo <<<END
                   <div class='files_element shadow-sm grid grid-cols-6 p-4 my-2'>
                   <a href="file.php?id=$id">$filename</a>
                   <div>
-                    <p>$description</p>
+                    <p> $short_desc... </p>
                   </div>
                   <div>
                     <p>$category_name </p>
@@ -171,10 +170,19 @@ include("actions/files/editFile.php");
           ?>
           <div class="mb-4">
             <?php
-            $count_sql = 'select count(*) as elements from files';
-            $result = mysqli_query($connection, $count_sql);
-            while ($row = $result->fetch_assoc()) {
-              $pages = $row['elements'] / $elements_per_page;
+              $result = mysqli_query($connection, "select total_downloads() as result")->fetch_assoc();
+              $result_value = $result['result'];
+              echo "<p> Всего загрузок: $result_value </p>"
+
+            ?>
+          </div>
+          <div class="mb-4">
+
+            <?php
+              $count_sql = "select count(*) as elements from files";
+              $count_sql_ex = $count_sql . $join_sql;
+              $result = mysqli_query($connection, $count_sql)->fetch_assoc();
+              $pages = $result['elements'] / $elements_per_page;
               echo "<form method='get' class='flex items-center gap-4'>";
               if (isset($_GET['column'])) {
                 $column = $_GET['column'];
@@ -185,14 +193,14 @@ include("actions/files/editFile.php");
                 echo "<input type='hidden' value='$order' name='order' /> ";
               }
               if (isset($_GET['category_id'])) {
-                $order = $_GET['category_id'];
-                echo "<input type='hidden' value='$category_id' name='order' /> ";
+                $category_id = $_GET['category_id'];
+                echo "<input type='hidden' value='$category_id' name='category_id' /> ";
               }
               if (isset($_GET['filename'])) {
                 $filename_param = $_GET['filename'];
                 echo "<input type='hidden' value='$filename_param' name='filename' /> ";
               }
-              $forward_state = $page >= $pages ? 'disabled' : '';
+              $forward_state = $page < $pages ? '' : 'disabled';
               $backward_state = $page <= 1 ? 'disabled' : '';
               echo <<<END
                     <button type="submit" onclick='submitCatcher(-1)' $backward_state class="flex items-center default-button py-1 px-4 blue-button"> <ion-icon style="font-size: 22px" name="arrow-back-circle-outline"></ion-icon> </button>
@@ -202,7 +210,7 @@ include("actions/files/editFile.php");
                     <button type="submit" onclick='submitCatcher(1)' $forward_state class=" flex items-center default-button py-1 px-4 blue-button"> <ion-icon  style="font-size: 22px" name="arrow-forward-circle-outline"></ion-icon> </button>
                   END;
               echo "</form>";
-            }
+            
             ?>
           </div>
         </div>

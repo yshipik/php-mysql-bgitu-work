@@ -16,6 +16,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'edit' && isset($_POST['id'])
         $hash = password_hash($salt . $password, PASSWORD_DEFAULT);
         
         if($is_set_password) {
+            $password = password_hash($salt . $password, PASSWORD_DEFAULT);
             $sql = "UPDATE admins set username = ?, email =  ?, password = ?, salt = ?, edit_downloads = ?, delete_downloads = ?, block_users = ?, block_admins = ? where id = ?";
             $connection->execute_query($sql, array($username, $email, $password, $salt, $edit_downloads, $delete_downloads, $block_users, $block_admins, $id));
           

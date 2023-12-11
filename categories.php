@@ -120,11 +120,12 @@ include("actions/deleteCategory.php");
               $description = $row['description'];
               $links = $row['links'];
               $total_downloads = $row['total_downloads'];
+              $short_desc = $description;
               echo <<<END
                   <div class='files_element shadow-sm grid grid-cols-5 p-4 my-2'>
                   <h3>$name</h3>
                   <div>
-                    <p>$description</p>
+                    <p>$short_desc</p>
                   </div>
                   <div>
                     <p>$links</p>
@@ -149,9 +150,9 @@ include("actions/deleteCategory.php");
           ?>
           <div class="mb-4">
             <?php
-            $count_sql = 'select count(*) as elements from categories';
-            $result = mysqli_query($connection, $count_sql);
-            while ($row = $result->fetch_assoc()) {
+              $count_sql = "select count(*) as elements from categories";
+              $count_sql_ex = $count_sql . $query_sql;
+              $row = mysqli_query($connection, $count_sql . $query_sql)->fetch_assoc();
               $pages = $row['elements'] / $elements_per_page;
               echo "<form method='get' class='flex items-center gap-4'>";
               if (isset($_GET['column'])) {
@@ -166,7 +167,7 @@ include("actions/deleteCategory.php");
                 $name = $_GET['name'];
                 echo "<input type='hidden' value='$name' name='name' /> ";
               }
-              $forward_state = $page >= $pages ? 'disabled' : '';
+              $forward_state = $page <= $pages ? '' : 'disabled';
               $backward_state = $page <= 1 ? 'disabled' : '';
               echo <<<END
                     <button type="submit" onclick='submitCatcher(-1)' $backward_state class="flex items-center default-button py-1 px-4 blue-button"> <ion-icon style="font-size: 22px" name="arrow-back-circle-outline"></ion-icon> </button>
@@ -176,7 +177,7 @@ include("actions/deleteCategory.php");
                     <button type="submit" onclick='submitCatcher(1)' $forward_state class=" flex items-center default-button py-1 px-4 blue-button"> <ion-icon  style="font-size: 22px" name="arrow-forward-circle-outline"></ion-icon> </button>
                   END;
               echo "</form>";
-            }
+            
             ?>
           </div>
         </div>

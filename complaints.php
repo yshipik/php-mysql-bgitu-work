@@ -93,7 +93,7 @@ include("actions/complaints/takeComplaint.php");
                     $start = ($page - 1) * $elements_per_page;
                     $end = $start + $page * $elements_per_page;
                     $sql = "select complaints.id, files.id as file_id, files.name as filename, admins.id as admin_id, header, text, username, file_id, complaints.email, state from complaints";
-                    $sql_limit = " limit $start, $end";
+                    $sql_limit = " limit $start, $elements_per_page";
                     $query_sql = '';
                     $join_sql = ' left join admins on admin_id = admins.id inner join files on files.id = file_id';
                     if (is_set_get_parameter('header') || is_set_get_parameter('borrowed') || is_set_get_parameter('state')) {
@@ -134,7 +134,7 @@ include("actions/complaints/takeComplaint.php");
                             $file_id = $row['file_id'];
                             $admin_id = $row['admin_id'];
                             $file_id = $row['file_id'];
-
+                                
                             echo <<<END
                             <div class='files_element shadow-sm grid grid-cols-6 p-4 my-2'>
                             <a href="complaint.php?id=$id" class='default-link link-decorated'>$header</a>
@@ -191,7 +191,7 @@ include("actions/complaints/takeComplaint.php");
                     <div class="mb-4">
                         <?php
                         $count_sql = 'select count(*) as elements from complaints';
-                        $result = mysqli_query($connection, $count_sql);
+                        $result = mysqli_query($connection, $count_sql . $join_sql . $query_sql);
                         while ($row = $result->fetch_assoc()) {
                             $pages = $row['elements'] / $elements_per_page;
                             echo "<form method='get' class='flex items-center gap-4'>";

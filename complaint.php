@@ -40,12 +40,7 @@ include("actions/complaints/takeComplaint.php");
     ?>
     <main>
         <?php
-        $elements_per_page = $_GET['elements'] ?? 3;
-        $page = isset($_GET['page']) && $_GET['page'] > 0 ? $_GET['page'] : 1;
-        $start = ($page - 1) * $elements_per_page;
-        $end = $start + $page * $elements_per_page;
         $sql = "select complaints.id, files.id as file_id, files.name as filename, admins.id as admin_id, header, text, username, file_id, complaints.email, state from complaints";
-        $sql_limit = " limit $start, $end";
         $query_sql = ' where complaints.id = ?';
         $join_sql = ' left join admins on admin_id = admins.id inner join files on files.id = file_id';
 

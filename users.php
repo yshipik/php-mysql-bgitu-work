@@ -51,8 +51,8 @@ include("actions/unbanUser.php");
                     <input type="text" name="name" placeholder="Поиск по имени" />
                     <select name="banned" id="confirmed">
                         <option value="" selected> </option>
-                        <option value="0"> Забанен </option>
-                        <option value="1"> Не забанен </option>
+                        <option value="1"> Забанен </option>
+                        <option value="0"> Не забанен </option>
                     </select>
                     <select name="confirmed" id="select-order"
                         class="bg-gray-50 border p-2 focus:ring-blue-500 border-gray-300 rounded-lg text-sm font-medium text-gray-900 dark:text-white">
@@ -98,13 +98,13 @@ include("actions/unbanUser.php");
                     $start = ($page - 1) * $elements_per_page;
                     $end = $start + $page * $elements_per_page;
                     $sql = "select * from users";
-                    $sql_limit = " limit $start, $end";
+                    $sql_limit = " limit $start, $elements_per_page";
                     $query_sql = '';
                     $where_trigger = false;
 
                     if (isset($_GET['name']) && $_GET['name'] != '') {
                         $encoded = mysqli_real_escape_string($connection, $_GET['name']);
-                        $query_sql .= "name like '$encoded%' ";
+                        $query_sql .= "username like '$encoded%' ";
                         $where_trigger = true;
                     }
 
@@ -116,14 +116,14 @@ include("actions/unbanUser.php");
 
                     if (isset($_GET['confirmed']) && $_GET['confirmed'] != '') {
                         $encoded = mysqli_real_escape_string($connection, $_GET['confirmed']);
-                        if (isset($_GET['banned'])) {
+                        if (is_set_get_parameter('banned')) {
                             $query_sql .= ' and ';
                         }
                         $query_sql .= "confirmed = $encoded ";
                         $where_trigger = true;
                     }
                     if ($where_trigger) {
-                        $query_sql = "where " . $query_sql;
+                        $query_sql = " where " . $query_sql;
                     }
                     $result = mysqli_query($connection, $sql . $query_sql . $sql_limit);
                     if ($result->num_rows > 0) {
@@ -187,10 +187,9 @@ include("actions/unbanUser.php");
                     ?>
                     <div class="mb-4">
                         <?php
-                        $count_sql = "select count(*) as elements from $target_table";
-                        $result = mysqli_query($connection, $count_sql);
-                        while ($row = $result->fetch_assoc()) {
-                            $pages = $row['elements'] / $elements_per_page;
+                            $count_sql = "select count(*) as elements from users";
+                            $result = mysqli_query($connection, $count_sql . $query_sql)->fetch_assoc();
+                            $pages =$result['elements'] / $elements_per_page;
                             echo "<form method='get' class='flex items-center gap-4'>";
                             if (isset($_GET['column'])) {
                                 $column = $_GET['column'];
@@ -204,7 +203,7 @@ include("actions/unbanUser.php");
                                 $name = $_GET['name'];
                                 echo "<input type='hidden' value='$name' name='name' /> ";
                             }
-                            $forward_state = $page <= $pages ? '' : 'disabled';
+                            $forward_state = $page < $pages ? '' : 'disabled';
                             $backward_state = $page <= 1 ? 'disabled' : '';
                             echo <<<END
                     <button type="submit" onclick='submitCatcher(-1)' $backward_state class="flex items-center default-button py-1 px-4 blue-button"> <ion-icon style="font-size: 22px" name="arrow-back-circle-outline"></ion-icon> </button>
@@ -214,22 +213,11 @@ include("actions/unbanUser.php");
                     <button type="submit" onclick='submitCatcher(1)' $forward_state class=" flex items-center default-button py-1 px-4 blue-button"> <ion-icon  style="font-size: 22px" name="arrow-forward-circle-outline"></ion-icon> </button>
                   END;
                             echo "</form>";
-                        }
+                        
                         ?>
                     </div>
                 </div>
 
-                <dialog id="create" class="px-8 rounded-md py-6">
-                    <form class="flex flex-col gap-4" method="post">
-                        <h4 class="block text-center"> Категория </h4>
-                        <input type="hidden" name="action" value="create" required />
-                        <input type="text" placeholder="Название категории" name="name" class="py-4" required />
-                        <textarea rows="5" placeholder="Описание категории" name="description" required
-                            class="py-4"> </textarea>
-                        <button class="default-button green-button default-button-padding" type="submit"> Добавить
-                            категорию</button>
-                    </form>
-                </dialog>
 
                 <dialog id="edit" class="px-8 rounded-md py-6">
                     <form class="flex flex-col gap-4" method="post">
@@ -239,16 +227,12 @@ include("actions/unbanUser.php");
                             required />
                         <textarea rows="5" placeholder="Описание категории" id="edit_description" name="description"
                             required class="py-4"> </textarea>
-                        <button class="default-button green-button default-button-padding" type="submit"> Добавить
-                            категорию</button>
+                        <button class="default-button green-button default-button-padding" type="submit"> Изменить </button>
                     </form>
                 </dialog>
 
 
-                <button class="default-button green-button px-8 py-4 flex items-center" onclick="showModal('create')">
-                    <ion-icon name="add-outline" style="font-size: 22px">
-                    </ion-icon> Добавить
-                </button>
+               
             </div>
         </div>
     </main>

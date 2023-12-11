@@ -15,7 +15,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'create' && isset($_POST['use
         try {
 
             $sql = "INSERT INTO admins values (NULL, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?) ";
-            $connection->execute_query($sql, array($username, $email, $password, $salt, $edit_downloads, $delete_downloads, $block_users, $block_admins));
+            $connection->execute_query($sql, array($username, $email, $hash, $salt, $edit_downloads, $delete_downloads, $block_users, $block_admins));
 
         } catch (Exception $e) {
             $error = $e->getMessage();

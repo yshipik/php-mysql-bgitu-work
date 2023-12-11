@@ -70,37 +70,20 @@ $is_banned = isset($data['banned']) && $data['banned'] == 1;
                 <h4 class="text-md"> Роль:
                     <?php echo $is_target_admin ? 'администратор' : 'пользователь' ?>
                 </h4>
-                <?php echo $data['banned'] ? '<h4 class="text-red-500"> Забанен </h4> ?>' : ''; ?>
-                <?php
-                if (isset($_SESSION['admin']) && $_SESSION['admin']) {
-                    echo `<h3>  </h3>`;
-                } ?>
-
-                <h4 class="text-md">
-                    <?php if (isset($data['edit_downloads'])) {
-                        echo '<h4 class="text-md"> Редактирование файлов: ' . ($data['edit_downloads'] ? "разрешено" : "запрещено") . "</h4>";
-                    } ?>
-                </h4>
-                <h4 class="text-md">
-                    <?php if (isset($data['delete_downloads'])) {
-                        echo '<h4 class="text-md"> Удаление файлов: ' . ($data['delete_downloads'] ? "разрешено" : "запрещено") . "</h4>";
-                    } ?>
-                </h4>
-                <h4 class="text-md">
-                    <?php if (isset($data['block_users'])) {
-                        echo "<h4 class='text-md'> Бан пользователей: " . ($data['block_users'] ? "разрешено" : "запрещено") . "</h4>";
-                    } ?>
-                </h4>
+                <?php 
+                    echo $data['banned'] ? '<h4 class="text-red-500"> Забанен </h4>' : '';
+                 ?>
+                
 
                 <h4 class="mb-2">
                     <?php echo $data['confirmed'] ? 'Аккаунт подтвержден' : 'Аккаунт не подтвержден' ?>
                 </h4>
                 <?php
                 echo "<div class='flex gap-1'>";
-                if (is_logged_in() && $is_target_admin) {
+                if (is_logged_in() && $is_visitor_admin) {
 
+                    $id = $data['id'];
                     if (!$is_banned) {
-                        $id = $data['id'];
 
                         echo <<<END
                             <form method='post'>
