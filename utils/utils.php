@@ -22,7 +22,7 @@ function is_logged_in()
 
 function not_banned()
 {
-    if (isset($_SESSION['banned']) && $_SESSION['banned'] == 0) {
+    if (isset($_SESSION['banned']) && $_SESSION['banned'] == 1) {
         return true;
     } else {
         return false;

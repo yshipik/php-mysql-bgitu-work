@@ -70,7 +70,7 @@ $is_banned = isset($data['banned']) && $data['banned'] == 1;
                 <h4 class="text-md"> Роль:
                     <?php echo $is_target_admin ? 'администратор' : 'пользователь' ?>
                 </h4>
-                <?php echo $data['banned'] ? '<h4 class="text-red-500"> Забанен </h4> ?>' : ''; ?>
+                <?php echo $data['banned'] == 1 ? '<h4 class="text-red-500"> Забанен </h4>' : ''; ?>
                 <?php
                 if (isset($_SESSION['admin']) && $_SESSION['admin']) {
                     echo `<h3>  </h3>`;
